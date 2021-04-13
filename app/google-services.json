@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "310994914170",
+    "firebase_url": "https://mapbox-fc0fa-default-rtdb.firebaseio.com",
+    "project_id": "mapbox-fc0fa",
+    "storage_bucket": "mapbox-fc0fa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310994914170:android:def751a46ab6aa0dbc64c3",
+        "android_client_info": {
+          "package_name": "fi.oamk.mapbox"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "310994914170-mko289jod7u3n615rtq2834vrran4sck.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsApFRJFwlR1yRne1akyEhmP8vLF_yGtg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "310994914170-mko289jod7u3n615rtq2834vrran4sck.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
