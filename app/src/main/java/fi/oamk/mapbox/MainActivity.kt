@@ -3,6 +3,7 @@ package fi.oamk.mapbox
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
@@ -13,15 +14,14 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 
 
-
-
-class MainActivity : AppCompatActivity(),OnMapReadyCallback {
+class MainActivity : AppCompatActivity() {//,OnMapReadyCallback {
 
     /*
     companion object {
@@ -50,21 +50,81 @@ class MainActivity : AppCompatActivity(),OnMapReadyCallback {
 
         mapView = findViewById(R.id.mapView)
         mapView?.onCreate(savedInstanceState)
-        mapView?.getMapAsync(this)
+        //mapView?.getMapAsync(this)
+
+        mapView?.getMapAsync { mapboxMap ->
+            mapboxMap.setStyle(Style.MAPBOX_STREETS) {
+                //var style: Style = mapboxMap.style!!
+                symbolManager = SymbolManager(mapView!!, mapboxMap, it)
+
+                //symbolManager.addClickListener {
+                //    Log.d("test", "Symbol clicked")
+                //    true
+                //}
+
+                symbolManager.addClickListener(OnSymbolClickListener { symbol: Symbol ->
+                    Toast.makeText(
+                        this,
+                        String.format("Symbol clicked %s", symbol.id),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    false
+                })
+
+                symbolManager.iconAllowOverlap = true
+                symbolManager.iconIgnorePlacement = true
+
+                val bm: Bitmap = BitmapFactory.decodeResource(
+                    resources,
+                    R.drawable.mapbox_marker_icon_default
+                )
+                mapboxMap.style?.addImage("place-marker", bm)
+
+                database.child("coordinates").get().addOnSuccessListener {
+                    val itemsFromDb: ArrayList<Any> = it.value as ArrayList<Any>
+                    for (i in 0..itemsFromDb.size-1) {
+                        val itemFromDb = itemsFromDb[i] as HashMap<String, Double>
+                        val lat = itemFromDb.get("lat").toString().toDouble()
+                        val lng = itemFromDb.get("lng").toString().toDouble()
+                        symbolManager.create(
+                            SymbolOptions()
+                                .withLatLng(LatLng(lat, lng))
+                                .withIconImage("place-marker")
+                                .withIconSize(1.3f)
+                        )
+                    }
+
+                }
+            }
+
+
+        }
 
     }
+
+/*
 
     override fun onMapReady(mapboxMap: MapboxMap) {
         //addMarkers(mapboxMap)
         _mapboxMap = mapboxMap
+        Log.d("Test","Map ready")
+
         mapboxMap.setStyle(Style.MAPBOX_STREETS) {
             var style: Style = mapboxMap.style!!
-            symbolManager = SymbolManager(mapView!!,mapboxMap,style)
+            symbolManager = SymbolManager(mapView!!, mapboxMap, style)
+
+            symbolManager.addClickListener {
+                Log.d("test","Symbol clicked")
+                true
+            }
 
             symbolManager.iconAllowOverlap = true
             symbolManager.iconIgnorePlacement = true
 
-            val bm: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.mapbox_marker_icon_default)
+            val bm: Bitmap = BitmapFactory.decodeResource(
+                resources,
+                R.drawable.mapbox_marker_icon_default
+            )
             mapboxMap.style?.addImage("place-marker", bm)
 
 
@@ -78,7 +138,8 @@ class MainActivity : AppCompatActivity(),OnMapReadyCallback {
                         SymbolOptions()
                             .withLatLng(LatLng(lat, lng))
                             .withIconImage("place-marker")
-                            .withIconSize(1.3f))
+                            .withIconSize(1.3f)
+                    )
                 }
 
             }
@@ -113,8 +174,10 @@ class MainActivity : AppCompatActivity(),OnMapReadyCallback {
         setCamera(mapboxMap)
     }
 
+
+ */
     private fun setCamera(map: MapboxMap) {
-        val latLng = LatLng(65.00,25.00)
+        val latLng = LatLng(65.00, 25.00)
         val position = CameraPosition.Builder().target(latLng).zoom(8.0).tilt(10.0).build()
         map.animateCamera(CameraUpdateFactory.newCameraPosition(position))
 
